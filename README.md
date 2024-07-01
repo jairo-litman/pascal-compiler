@@ -1,48 +1,38 @@
-# Analisador léxico de Pascal reduzido
+# Analisador sintático de Pascal reduzido
 
 ## Descrição
 
-Este analisador léxico foi desenvolvido para a disciplina de Compiladores I, ministrada pela professora Juliana da Costa Feitosa.
+Este analisador sintático foi desenvolvido para a disciplina de Compiladores I, ministrada pela professora Juliana da Costa Feitosa.
 
-O analisador léxico foi desenvolvido em C e tem como objetivo analisar um código fonte escrito em Pascal, com uma gramática reduzida, e identificar os tokens presentes no código.
+O analisador sintático foi desenvolvido em C e identifica os tokens presentes no código fonte em Pascal e constrói uma arvore sintática abstrata. O analisador léxico foi desenvolvido para uma gramática reduzida de Pascal e não contempla todas as regras da linguagem.
 
 ## Funcionamento
 
-O analisador léxico lê um arquivo de entrada, que contém o código fonte em Pascal, e identifica os tokens presentes no código. Também é possível utilizar um REPL para digitar o código fonte diretamente no terminal.
+O analisador léxico lê um arquivo de entrada, que contém o código fonte em Pascal, e identifica os tokens presentes no código. Logo, os tokens são analisados pelo analisador sintático, que constrói uma árvore sintática abstrata. A árvore sintática abstrata é escrita em um arquivo de saída, ou no terminal, dependendo do modo de execução do programa.
 
-Os tokens são representados da seguinte forma:
+Também é possível utilizar um REPL para digitar o código fonte diretamente no terminal.
 
-```
-0xnn0xmm
-```
-
-Onde `nn` é o número identificador do tipo do token e `mm` é o número identificador para identificadores, ou variáveis, e literais. O valor de `mm` é um contador que é incrementado a cada novo identificador ou literal encontrado, identificadores e literais possuem contadores separados.
-
-Os tokens são escritos em um arquivo de saída, ou no terminal, dependendo do modo de execução do programa. O arquivo, dependendo do argumento passado na execução do programa, terá uma das seguintes estruturas:
+A arvore sintática abstrata é escrita no arquivo de saída no seguinte formato:
 
 ```
-MODO DEBUG
-
-Linha 0001: 0x010x00 (1 0)[literal1] 0x020x00 (2 0)[literal2]
-Linha 0002: 0x030x00 (3 0)[literal3] 0x040x00 (4 0)[literal4]
-```
-
-```
-MODO NORMAL
-
-Linha 0001: 0x010x00 0x020x00
-Linha 0002: 0x030x00 0x040x00
-```
-
-```
-MODO SIMPLES
-
-0x010x000x020x000x030x000x040x00
+Program: {
+    Identifier: <identificador>
+    Block: {
+        <Var>: {...}
+        <Procedure>: {...}
+        <Function>: {...}
+        Begin: {
+            <Statement>: {...}
+            <Statement>: {...}
+            ...
+        }
+    }
+}
 ```
 
 ## Execução
 
-Para executar o analisador léxico, basta compilar o código fonte e executar o programa passando o arquivo de entrada como argumento. O arquivo de entrada deve conter o código fonte em Pascal.
+Para executar o analisador sintático, basta compilar o código fonte e executar o programa passando o arquivo de entrada como argumento. O arquivo de entrada deve conter o código fonte em Pascal.
 
 Para compilar o código fonte, recomenda-se utilizar cmake com o seguinte comando:
 
@@ -54,22 +44,22 @@ cmake --build build --config Release --target all
 O executável será gerado na pasta `bin` e pode ser executado da seguinte forma:
 
 ```
-./PascalLexicalAnalyzer <arquivo de entrada> <arquivo de saída> <modo>
+./PascalSyntaxAnalyzer <arquivo de entrada> <arquivo de saída>
 ```
 
-Onde `<arquivo de entrada>` é o arquivo contendo o código fonte em Pascal, `<arquivo de saída>` é o arquivo onde os tokens serão escritos e `<modo>` é o modo de escrita dos tokens, podendo ser `debug`, `normal` ou `simple`.
+Onde `<arquivo de entrada>` é o arquivo contendo o código fonte em Pascal, `<arquivo de saída>` é o arquivo onde a árvore sintática abstrata será escrita.
 
 Alternativamente, pode-se iniciar o REPL passando o argumento `repl`:
 
 ```
-./PascalLexicalAnalyzer repl
+./PascalSyntaxAnalyzer repl
 ```
 
-O REPL permite que o usuário digite o código fonte diretamente no terminal e exibe os tokens identificados.
+O REPL permite que o usuário digite o código fonte diretamente no terminal e exibe a árvore sintática abstrata no terminal.
 
 ## Exemplo
 
-Para exemplificar o funcionamento do analisador léxico, considere o seguinte código fonte em Pascal:
+Para exemplificar o funcionamento do analisador sintático, considere o seguinte código fonte em Pascal:
 
 ```
 program SumTwoNumbers;
@@ -83,20 +73,44 @@ begin
 end.
 ```
 
-O analisador léxico identificará os seguintes tokens:
+O analisador sintático criará a seguinte árvore sintática abstrata:
 
 ```
-MODO DEBUG
-
-Linha 0001: 0x280x00 (40 0)[program] 0x020x01 (2 1)[sumtwonumbers] 0x200x00 (32 0)[;] 
-Linha 0002: 0x3a0x00 (58 0)[var] 
-Linha 0003: 0x020x02 (2 2)[a] 0x1e0x00 (30 0)[,] 0x020x03 (2 3)[b] 0x210x00 (33 0)[:] 0x0b0x00 (11 0)[integer] 0x200x00 (32 0)[;] 
-Linha 0004: 0x020x04 (2 4)[sum] 0x210x00 (33 0)[:] 0x0b0x00 (11 0)[integer] 0x200x00 (32 0)[;] 
-Linha 0005: 0x290x00 (41 0)[begin] 
-Linha 0006: 0x020x05 (2 5)[a] 0x0e0x00 (14 0)[:=] 0x060x01 (6 1)[10] 0x200x00 (32 0)[;] 
-Linha 0007: 0x020x06 (2 6)[b] 0x0e0x00 (14 0)[:=] 0x060x02 (6 2)[20] 0x200x00 (32 0)[;] 
-Linha 0008: 0x020x07 (2 7)[sum] 0x0e0x00 (14 0)[:=] 0x020x08 (2 8)[a] 0x0f0x00 (15 0)[+] 0x020x09 (2 9)[b] 0x200x00 (32 0)[;] 
-Linha 0009: 0x2a0x00 (42 0)[end] 0x1f0x00 (31 0)[.] 
+Program: {
+	Identifier: sumtwonumbers
+	Block: {
+		Var: {
+			Declaration: {
+				Identifiers: {a, b}
+				Type: integer
+			}
+			Declaration: {
+				Identifiers: {sum}
+				Type: integer
+			}
+		}
+		Begin: {
+			Expression: {
+				Assignment: {
+					Identifier: a
+					Value: 10
+				}
+			}
+			Expression: {
+				Assignment: {
+					Identifier: b
+					Value: 20
+				}
+			}
+			Expression: {
+				Assignment: {
+					Identifier: sum
+					Value: (a + b)
+				}
+			}
+		}
+	}
+}
 ```
 
 ## Tokens
@@ -172,11 +186,49 @@ LABEL     = 0x40    label
 NIL       = 0x41    nil
 ```
 
+## Gramática
+
+Ném todos os tokens são reconhecidos pela gramática. A gramática é a seguinte:
+
+```
+<program> ::= program <identifier>; <block>.
+<block> ::= [<variable declarations>] [<subroutines>] <composite command>
+<variable declarations> ::= var <declaration> {;<declaration>};
+<declaration> ::= <identifiers> : <type>
+<identifiers> ::= <identifier> {, <identifier>}
+<subroutines> ::= {<function declaration> | <procedure declaration>}
+<function declaration> ::= function <identifier> [<formal parameters>] : <type> ; <block>
+<procedure declaration> ::= procedure <identifier> [<formal parameters>] ; <block>
+<formal parameters> ::= (<parameter> {; <parameter>})
+<parameter> ::= [var] <identifiers> : <type>
+<composite command> ::= begin <command> {; <command>}; end
+<command> ::= <assignment> | <call> | <composite command> | <conditional> | <while>
+<assignment> ::= <variable> := <expression>
+<call> ::= <identifier>(<expressions>)
+<conditional> ::= if <expression> then <command> [else <command>]
+<while> ::= while <expression> do <command>
+<expressions> ::= <expression> {, <expression>}
+<expression> ::= <simple expression> [ <relational operator> <simple expression>]
+<simple expression> ::= [+|-] <term> {(+|-|or) <term>}
+<term> ::= <factor> {(*|/|div|mod|and) <factor>}
+<factor> ::= <variable> | <number> | <string> | <char> | <boolean> | (<expression>) | not <factor>
+<variable> ::= <identifier>
+<number> ::= <digit> {<digit>}
+<string> ::= "<character> {<character>}"
+<char> ::= '<character>'
+<boolean> ::= true | false
+<relational operator> ::= = | <> | < | > | <= | >=
+<type> ::= integer | real | boolean | char | string
+<digit> ::= 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+<character> ::= a | b | c | ... | z | A | B | C | ... | Z
+<identifier> ::= <character> {<character> | <digit>}
+```
+
 ## Considerações
 
-O analisador léxico foi desenvolvido para uma gramática reduzida de Pascal e não contempla todas as regras da linguagem. O analisador léxico foi desenvolvido com o intuito de identificar os tokens presentes no código fonte e não realiza a análise sintática ou semântica do código.
+O analisador sintático foi desenvolvido para uma gramática reduzida de Pascal e não contempla todas as regras da linguagem. O analisador sintático foi desenvolvido com o intuito de criar uma árvore sintática abstrata simples e não realiza a analise semântica do código fonte.
 
-O código foi adaptado do analisador léxico que desenvolvi para minha propia linguagem de programação, escrita em Go, disponível em [Github](github.com/jairo-litman/cidoka-lang).
+O código foi adaptado do analisador sintático que desenvolvi para minha propia linguagem de programação, escrita em Go, disponível em [Github](github.com/jairo-litman/cidoka-lang).
 
 ## Licença
 

@@ -3,9 +3,9 @@
 
 #include "lexer.h"
 
-void startRepl();
+void rStartRepl();
 
-void lexerNewInput(Lexer *l, char *input);
-void freeLexerNoInput(Lexer *l);
+void rLexerNewInput(Lexer *l, char *input);
+void rFreeLexerNoInput(Lexer *l);
 
 #endif  // REPL_H

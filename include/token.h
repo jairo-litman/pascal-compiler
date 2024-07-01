@@ -1,7 +1,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include <stdint.h>
+#include "hashmap.h"
 
 #define HM_CAPACITY 1024
 
@@ -98,27 +98,11 @@ typedef struct {
     char     *literal;
 } Token;
 
-typedef struct HashPair {
-    char            *key;
-    TokenType        value;
-    struct HashPair *next;
-} HashPair;
+Token *tNewToken(TokenType type, char *literal);
+void   tFreeToken(Token *t);
 
-typedef struct {
-    HashPair **pairs;
-    uint32_t (*hash)(const char *key);
-    int32_t (*cmp)(const char *a, const char *b);
-} HashMap;
-
-void      initKeywords(HashMap *keywords);
-TokenType lookupIdent(HashMap *keywords, char *ident);
-
-uint32_t strHash(const char *key);
-
-HashMap *newHashMap(uint32_t (*hash)(const char *key), int32_t (*cmp)(const char *a, const char *b));
-void     freeHashMap(HashMap *hm);
-
-TokenType hmGet(HashMap *hm, char *key);
-int32_t   hmInsert(HashMap *hm, char *key, TokenType value);
+void      tInitKeywords(HashMap *keywords);
+void      tRegisterKeyword(HashMap *keywords, char *key, TokenType value);
+TokenType tLookupIdent(HashMap *keywords, char *ident);
 
 #endif  // TOKEN_H
