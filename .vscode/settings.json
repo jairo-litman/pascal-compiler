@@ -1,0 +1,11 @@
+{
+    "cmake.debugConfig": {
+        "args": [
+            "${workspaceFolder}/bin/test2.txt",
+            // "${workspaceFolder}/bin/Trab1_Compiladores.txt",
+            "${workspaceFolder}/bin/out.txt",
+            "debug",
+            // "repl"
+        ]
+    }
+}
